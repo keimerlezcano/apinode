@@ -1,9 +1,9 @@
 // services/pagosService.js
-const { Pago } = require('../models');
+const pagosRepository = require('../repositories/pagosRepository');
 
 const getAllPagos = async () => {
     try {
-        const pagos = await Pago.findAll();
+        const pagos = await pagosRepository.getAllPagos();
         return pagos;
     } catch (error) {
         throw new Error('Error al obtener los pagos');
@@ -12,7 +12,7 @@ const getAllPagos = async () => {
 
 const getPagoById = async (id) => {
     try {
-        const pago = await Pago.findByPk(id);
+        const pago = await pagosRepository.getPagoById(id);
         return pago;
     } catch (error) {
         throw new Error('Error al obtener el pago');
@@ -21,7 +21,7 @@ const getPagoById = async (id) => {
 
 const createPago = async (data) => {
     try {
-        const nuevoPago = await Pago.create(data);
+        const nuevoPago = await pagosRepository.createPago(data);
         return nuevoPago;
     } catch (error) {
         throw new Error('Error al crear el pago');
@@ -30,19 +30,8 @@ const createPago = async (data) => {
 
 const updatePago = async (id, data) => {
     try {
-        const pago = await Pago.findByPk(id);
-        if (!pago) {
-            throw new Error('Pago no encontrado');
-        }
-
-        // Actualiza solo los campos permitidos
-        pago.nombreCliente = data.nombreCliente;
-        pago.metodoPago = data.metodoPago;
-        pago.mesPago = data.mesPago;
-
-        await pago.save(); // Guarda los cambios
+        const pago = await pagosRepository.updatePago(id, data);
         return pago;
-
     } catch (error) {
         throw new Error('Error al actualizar el pago');
     }
