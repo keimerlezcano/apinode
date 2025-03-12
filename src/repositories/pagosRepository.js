@@ -5,7 +5,6 @@ const getAllPagos = async () => {
     try {
         return await Pago.findAll();
     } catch (error) {
-        console.error("Error en getAllPagos:", error); // Agrega este log
         throw new Error('Error al obtener los pagos');
     }
 };

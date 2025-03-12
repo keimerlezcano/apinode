@@ -1,8 +1,8 @@
-// middlewares/pagosValidation.js
-const { body, validationResult } = require('express-validator');
+const { body, param } = require('express-validator');
+const pagosRepository = require('../repositories/pagosRepository'); // Aunque no se use, se importa para mantener la estructura
 
-// Reglas de validación para la creación y actualización de pagos
-const pagoValidationRules = [
+// Validación base para la creación y actualización de pagos
+const pagoBaseValidation = [
     body('nombreCliente')
         .notEmpty()
         .withMessage('El nombre del cliente es obligatorio')
@@ -20,16 +20,24 @@ const pagoValidationRules = [
         .withMessage('El mes de pago debe ser un número entre 1 y 12')
 ];
 
-// Middleware para ejecutar las validaciones
-const validatePago = (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ message: 'Error de validación', errors: errors.array() });
-    }
-    next();
-};
+// Validación para crear un pago
+const createPagoValidation = [
+    ...pagoBaseValidation
+];
+
+// Validación para actualizar un pago
+const updatePagoValidation = [
+    ...pagoBaseValidation,
+    param('id').isInt().withMessage('El id debe ser un número entero')
+];
+
+// Validación para obtener un pago por ID
+const getPagoByIdValidation = [
+    param('id').isInt().withMessage('El id debe ser un número entero')
+];
 
 module.exports = {
-    pagoValidationRules,
-    validatePago
+    createPagoValidation,
+    updatePagoValidation,
+    getPagoByIdValidation
 };

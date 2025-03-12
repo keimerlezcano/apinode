@@ -8,17 +8,24 @@ const sedeBaseValidation = [
         .withMessage('El nombre debe tener al menos 3 caracteres')
         .matches(/^[^0-9]+$/) // Asegura que no haya números en el nombre
         .withMessage('El nombre de la sede no puede contener números')
+        .custom(async (NombreSede, { req }) => {
+            const sedeExistsWithSameName = await sedeExists(NombreSede);
+            if (sedeExistsWithSameName) {
+              if (req && req.params && req.params.id) {
+                 const sedeFromDB = await sedeExists(NombreSede);
+                  if(sedeFromDB.id == req.params.id){
+                    return true; 
+                  }
+              }
+                return Promise.reject('Ya existe una sede con este nombre.');
+            }
+        })
 ];
 
 // Validación para crear una sede
 const createSedeValidation = [
-    ...sedeBaseValidation,
-    body('NombreSede').custom(async (NombreSede) => {
-        const exists = await sedeExists(NombreSede);
-        if (exists) {
-            return Promise.reject('La sede ya existe');
-        }
-    })
+    ...sedeBaseValidation
+    // Ya no necesitamos la validación de existencia aquí, está en sedeBaseValidation
 ];
 
 // Validación para actualizar una sede
@@ -31,6 +38,7 @@ const updateSedeValidation = [
             return Promise.reject('La sede no existe');
         }
     })
+    // Ya no necesitamos la validación de nombre aquí, está en sedeBaseValidation
 ];
 
 // Validación para eliminar una sede

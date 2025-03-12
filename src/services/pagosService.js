@@ -1,36 +1,39 @@
-// services/pagosService.js
 const pagosRepository = require('../repositories/pagosRepository');
 
-const getAllPagos = async () => {
+const listPagos = async () => {
     try {
-        const pagos = await pagosRepository.getAllPagos();
-        return pagos;
+        return await pagosRepository.getAllPagos();
     } catch (error) {
         throw new Error('Error al obtener los pagos');
     }
 };
 
-const getPagoById = async (id) => {
+const findPago = async (id) => {
     try {
         const pago = await pagosRepository.getPagoById(id);
+        if (!pago) {
+            throw new Error('Pago no encontrado');
+        }
         return pago;
     } catch (error) {
         throw new Error('Error al obtener el pago');
     }
 };
 
-const createPago = async (data) => {
+const addPago = async (pagoData) => {
     try {
-        const nuevoPago = await pagosRepository.createPago(data);
-        return nuevoPago;
+        return await pagosRepository.createPago(pagoData);
     } catch (error) {
-        throw new Error('Error al crear el pago');
+        throw new Error('Error al agregar el pago');
     }
 };
 
-const updatePago = async (id, data) => {
+const modifyPago = async (id, pagoData) => {
     try {
-        const pago = await pagosRepository.updatePago(id, data);
+        const pago = await pagosRepository.updatePago(id, pagoData);
+        if (!pago) {
+            throw new Error('Pago no encontrado');
+        }
         return pago;
     } catch (error) {
         throw new Error('Error al actualizar el pago');
@@ -38,8 +41,8 @@ const updatePago = async (id, data) => {
 };
 
 module.exports = {
-    getAllPagos,
-    getPagoById,
-    createPago,
-    updatePago
+    listPagos,
+    findPago,
+    addPago,
+    modifyPago
 };

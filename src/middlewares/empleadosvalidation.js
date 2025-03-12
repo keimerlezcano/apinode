@@ -38,6 +38,7 @@ const updateEmpleadoValidation = [
         }
         req.empleadoOriginal = empleadoExists; // Guarda el empleado original en el request
     }),
+    
     body('numeroIdentificacion').custom(async (numeroIdentificacion, { req }) => {
         if (numeroIdentificacion !== req.empleadoOriginal.numeroIdentificacion) {
             // Si el numeroIdentificacion se modificó, verifica que sea único

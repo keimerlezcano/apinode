@@ -1,51 +1,70 @@
-// controllers/pagosController.js
+const { validationResult } = require('express-validator');
 const pagosService = require('../services/pagosService');
 
-// Obtener todos los pagos
-exports.getAllPagos = async (req, res) => {
+// Controlador para obtener todos los pagos
+const getPagos = async (req, res) => {
     try {
-        const pagos = await pagosService.getAllPagos();
-        res.json(pagos);
+        const pagos = await pagosService.listPagos();
+        res.status(200).json(pagos);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: 'Error al obtener los pagos', error: error.message });
     }
 };
 
-// Obtener un pago por ID
-exports.getPagoById = async (req, res) => {
-    const { id } = req.params;
+// Controlador para agregar un nuevo pago
+const addPago = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     try {
-        const pago = await pagosService.getPagoById(id);
+        const pago = await pagosService.createPago(req.body);
+        res.status(201).json(pago);
+    } catch (error) {
+        res.status(400).json({ message: 'Error al añadir el pago', errors: error.errors });
+    }
+};
+
+// Controlador para obtener un pago específico por su ID
+const getPagoById = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+        const pago = await pagosService.getPagoById(req.params.id);
         if (!pago) {
             return res.status(404).json({ message: 'Pago no encontrado' });
         }
-        res.json(pago);
+        res.status(200).json(pago);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: 'Error al obtener el pago', error: error.message });
     }
 };
 
-// Crear un nuevo pago
-exports.createPago = async (req, res) => {
+// Controlador para actualizar un pago existente
+const updatePago = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     try {
-        const nuevoPago = await pagosService.createPago(req.body);
-        res.status(201).json(nuevoPago);
+        const pago = await pagosService.updatePago(req.params.id, req.body);
+        if (!pago) {
+            return res.status(404).json({ message: 'Pago no encontrado' });
+        }
+        res.status(200).json({ message: 'Pago actualizado' });
     } catch (error) {
-        console.error(error);
-        res.status(400).json({ message: 'Error al crear el pago', errors: error.errors }); // Devuelve errores de validación
+        res.status(400).json({ message: 'Error al actualizar el pago', error: error.message });
     }
 };
 
-// Actualizar un pago (sin permitir la edición del valor ni la fecha)
-exports.updatePago = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const pagoActualizado = await pagosService.updatePago(id, req.body);
-        res.json(pagoActualizado);
-    } catch (error) {
-        console.error(error);
-        res.status(400).json({ message: 'Error al actualizar el pago', errors: error.errors });
-    }
+module.exports = {
+    getPagos,
+    addPago,
+    getPagoById,
+    updatePago
 };
